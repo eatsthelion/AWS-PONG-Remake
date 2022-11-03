@@ -1,0 +1,27 @@
+#Lambda Code
+import json
+import boto3
+
+def lambda_handler(event, context):
+    messageJSON=event
+    recordsObj=messageJSON["Records"][0]
+    msgsns=recordsObj["Sns"]
+    msgmsg=json.loads(msgsns["Message"])
+    message=msgmsg["messageBody"]
+    update_state = {
+        'state':{
+            'desired': {
+                'input' : message,
+            }
+        }
+    }
+    
+    client = boto3.client('iot-data', region_name='us-west-2', endpoint_url='https://a1wk2g9fpdvqmn-ats.iot.us-west-2.amazonaws.com')
+    response = client.update_thing_shadow(
+    thingName='Ethan_CC3200Board',
+    payload= json.dumps(update_state)
+    )
+    return {
+        'statusCode': 200,
+        'body': json.dumps('hello world!')
+    }
